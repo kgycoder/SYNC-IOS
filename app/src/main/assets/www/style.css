@@ -4192,17 +4192,12 @@ button, a, div, span, input {
     margin-bottom: 20px;
     border-radius: 30px;
     /* overflow는 절대 hidden 금지: 검색 추천 드롭다운(.sug-drop)이 캡슐 아래로
-       펼쳐져야 하므로 클리핑하면 안 됨. backdrop-filter는 border-radius를
-       그대로 따라가므로 overflow:hidden 없이도 캡슐 형태로 렌더링된다. */
+       펼쳐져야 하므로 클리핑하면 안 됨. 유리 표면(배경/보더/그림자/굴절)은
+       :before 의사요소로 옮겨 그쪽에만 continuous-corner clip-path를 적용한다.
+       (clip-path는 border-radius와 달리 overflow까지 함께 잘라내므로, 본체에
+       직접 걸면 드롭다운까지 잘려버린다.) */
     isolation: isolate;
-    background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-    border: 1px solid rgba(255,255,255,.16);
-    box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.18),
-        inset 0 -1px 0 rgba(255,255,255,.05),
-        0 12px 34px rgba(0,0,0,.30);
-    backdrop-filter: url(#liquidGlassSearchFilter);
-    -webkit-backdrop-filter: blur(12px) saturate(1.4);
+    --squircle-clip: none;
 }
 
     .mob-srch-wrap:before {
@@ -4212,8 +4207,19 @@ button, a, div, span, input {
         pointer-events: none;
         border-radius: inherit;
         z-index: 0;
-        background: linear-gradient(90deg, rgba(255,255,255,.03), transparent 25%, transparent 75%, rgba(255,255,255,.03));
-        box-shadow: inset 0 0 0 1px rgba(255,255,255,.05);
+        background-image:
+            linear-gradient(90deg, rgba(255,255,255,.03), transparent 25%, transparent 75%, rgba(255,255,255,.03)),
+            linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+        border: 1px solid rgba(255,255,255,.16);
+        box-shadow:
+            inset 0 1px 0 rgba(255,255,255,.18),
+            inset 0 -1px 0 rgba(255,255,255,.05),
+            inset 0 0 0 1px rgba(255,255,255,.05),
+            0 12px 34px rgba(0,0,0,.30);
+        backdrop-filter: url(#liquidGlassSearchFilter);
+        -webkit-backdrop-filter: blur(12px) saturate(1.4);
+        clip-path: var(--squircle-clip);
+        -webkit-clip-path: var(--squircle-clip);
     }
 
 .mob-srch-wrap .srch-inp {
