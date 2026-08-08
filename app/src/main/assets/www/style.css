@@ -4194,14 +4194,14 @@ button, a, div, span, input {
        펼쳐져야 하므로 클리핑하면 안 됨. backdrop-filter는 border-radius를
        그대로 따라가므로 overflow:hidden 없이도 캡슐 형태로 렌더링된다. */
     isolation: isolate;
-    background: linear-gradient(180deg, rgba(28,29,31,.64), rgba(17,18,19,.56));
-    border: 1px solid rgba(255,255,255,.18);
+    background: linear-gradient(180deg, rgba(255,255,255,.20), rgba(255,255,255,.09));
+    border: 1px solid rgba(255,255,255,.32);
     box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.22),
-        inset 0 -1px 0 rgba(255,255,255,.08),
-        0 12px 34px rgba(0,0,0,.30);
+        inset 0 1px 0 rgba(255,255,255,.55),
+        inset 0 -1px 0 rgba(255,255,255,.12),
+        0 12px 34px rgba(0,0,0,.22);
     backdrop-filter: url(#liquidGlassSearchFilter);
-    -webkit-backdrop-filter: blur(12px) saturate(1.3);
+    -webkit-backdrop-filter: blur(12px) saturate(1.5) brightness(1.28) contrast(1.02);
 }
 
     .mob-srch-wrap:before {
@@ -4281,14 +4281,14 @@ button, a, div, span, input {
     align-items: stretch;
     isolation: isolate;
     overflow: hidden;
-    background: linear-gradient(180deg, rgba(28,29,31,.66), rgba(17,18,19,.58));
-    border: 1px solid rgba(255,255,255,.18);
+    background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.07));
+    border: 1px solid rgba(255,255,255,.30);
     box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.22),
-        inset 0 -1px 0 rgba(255,255,255,.08),
-        0 15px 45px rgba(0,0,0,.38);
+        inset 0 1px 0 rgba(255,255,255,.50),
+        inset 0 -1px 0 rgba(255,255,255,.10),
+        0 15px 45px rgba(0,0,0,.28);
     backdrop-filter: url(#liquidGlassNavFilter);
-    -webkit-backdrop-filter: blur(16px) saturate(1.3);
+    -webkit-backdrop-filter: blur(14px) saturate(1.5) brightness(1.28) contrast(1.02);
 }
 
     #mob-nav:before {
@@ -4317,12 +4317,12 @@ button, a, div, span, input {
     z-index: 1;
     pointer-events: none;
     isolation: isolate;
-    background: linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.05));
-    border: 1px solid rgba(255,255,255,.30);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.38), inset 0 -1px 0 rgba(255,255,255,.08), 0 4px 14px rgba(0,0,0,.35);
+    background: linear-gradient(180deg, rgba(255,255,255,.34), rgba(255,255,255,.12));
+    border: 1px solid rgba(255,255,255,.46);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.60), inset 0 -1px 0 rgba(255,255,255,.14), 0 4px 14px rgba(0,0,0,.28);
     /* 강한 Edge 굴절: 전용 SVG 필터로 캡슐 가장자리를 렌즈처럼 왜곡시킨다 (범위/강도 확대) */
     backdrop-filter: url(#liquidGlassPillFilter);
-    -webkit-backdrop-filter: blur(5px) saturate(1.6);
+    -webkit-backdrop-filter: blur(5px) saturate(1.6) brightness(1.3) contrast(1.02);
     transition: left .46s cubic-bezier(.22,1.61,.36,1), width .46s cubic-bezier(.22,1.61,.36,1);
 }
 
@@ -4346,14 +4346,14 @@ button, a, div, span, input {
     right: 16px;
     border-radius: 32px;
     isolation: isolate;
-    background: linear-gradient(180deg, rgba(28,29,31,.66), rgba(17,18,19,.58)) !important;
+    background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.07)) !important;
     backdrop-filter: url(#liquidGlassBarFilter) !important;
-    -webkit-backdrop-filter: blur(16px) saturate(1.3) !important;
-    border: 1px solid rgba(255,255,255,.18);
+    -webkit-backdrop-filter: blur(14px) saturate(1.5) brightness(1.28) contrast(1.02) !important;
+    border: 1px solid rgba(255,255,255,.30);
     box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.22),
-        inset 0 -1px 0 rgba(255,255,255,.08),
-        0 15px 45px rgba(0,0,0,.38);
+        inset 0 1px 0 rgba(255,255,255,.50),
+        inset 0 -1px 0 rgba(255,255,255,.10),
+        0 15px 45px rgba(0,0,0,.28);
 }
 
     #bar:before {
