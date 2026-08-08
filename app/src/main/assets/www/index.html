@@ -471,7 +471,7 @@
                 <feDisplacementMap id="searchGlassRefraction" in="SourceGraphic" in2="searchMap"
                     scale="1" xChannelSelector="R" yChannelSelector="G" result="searchRefracted"/>
                 <feGaussianBlur in="searchRefracted" stdDeviation="1" result="searchBlurred"/>
-                <feBlend in="searchRefracted" in2="searchBlurred" mode="screen" result="searchSoft"/>
+                <feBlend in="searchRefracted" in2="searchBlurred" mode="normal" result="searchSoft"/>
             </filter>
 
             <filter id="liquidGlassNavFilter" x="-15%" y="-30%" width="130%" height="160%" color-interpolation-filters="sRGB" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse">
@@ -479,7 +479,7 @@
                 <feDisplacementMap id="navGlassRefraction" in="SourceGraphic" in2="navMap"
                     scale="1" xChannelSelector="R" yChannelSelector="G" result="navRefracted"/>
                 <feGaussianBlur in="navRefracted" stdDeviation="1" result="navBlurred"/>
-                <feBlend in="navRefracted" in2="navBlurred" mode="screen" result="navSoft"/>
+                <feBlend in="navRefracted" in2="navBlurred" mode="normal" result="navSoft"/>
             </filter>
 
             <filter id="liquidGlassBarFilter" x="-15%" y="-30%" width="130%" height="160%" color-interpolation-filters="sRGB" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse">
@@ -487,7 +487,7 @@
                 <feDisplacementMap id="barGlassRefraction" in="SourceGraphic" in2="barMap"
                     scale="1" xChannelSelector="R" yChannelSelector="G" result="barRefracted"/>
                 <feGaussianBlur in="barRefracted" stdDeviation="1" result="barBlurred"/>
-                <feBlend in="barRefracted" in2="barBlurred" mode="screen" result="barSoft"/>
+                <feBlend in="barRefracted" in2="barBlurred" mode="normal" result="barSoft"/>
             </filter>
 
             <filter id="liquidGlassPillFilter" x="-40%" y="-70%" width="180%" height="240%" color-interpolation-filters="sRGB" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse">
@@ -495,7 +495,7 @@
                 <feDisplacementMap id="pillGlassRefraction" in="SourceGraphic" in2="pillMap"
                     scale="1" xChannelSelector="R" yChannelSelector="G" result="pillRefracted"/>
                 <feGaussianBlur in="pillRefracted" stdDeviation=".4" result="pillBlurred"/>
-                <feBlend in="pillRefracted" in2="pillBlurred" mode="screen" result="pillSoft"/>
+                <feBlend in="pillRefracted" in2="pillBlurred" mode="normal" result="pillSoft"/>
             </filter>
         </defs>
     </svg>
