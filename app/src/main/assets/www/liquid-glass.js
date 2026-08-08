@@ -103,7 +103,12 @@
         image.setAttribute("width", r.width);
         image.setAttribute("height", r.height);
         image.setAttribute("x", 0); image.setAttribute("y", 0);
-        refraction.setAttribute("scale", (map.scale * (boost || 1)).toFixed(2));
+        // 과도한 boost가 요소 자체 높이를 넘는 변위를 만들면 displacement가
+        // 배경 밖을 샘플링해 굴절이 통째로 사라지므로(투명해짐), 요소 크기에
+        // 비례한 상한을 둔다.
+        const rawScale = map.scale * (boost || 1);
+        const finalScale = Math.min(rawScale, r.height * .58, 60);
+        refraction.setAttribute("scale", finalScale.toFixed(2));
     }
 
     function visibleSearchWrap() {
@@ -119,7 +124,7 @@
             applyGlassTo(bar, "#barDisplacementMap", "#barGlassRefraction", 32);
         }
         // 작은 캡슐(필)은 가장자리 굴절을 훨씬 강하고 넓게 (bezel↑, boost 3.2배)
-        applyGlassTo(document.getElementById("mnPill"), "#pillDisplacementMap", "#pillGlassRefraction", 40, 3.2);
+        applyGlassTo(document.getElementById("mnPill"), "#pillDisplacementMap", "#pillGlassRefraction", 40, 2.4);
     }
 
     /* 재생이 시작되어 미니 플레이어 바(#bar)가 'bar-hidden'을 벗고 나타날 때
@@ -198,7 +203,7 @@
         if (!pill) return;
         pill.addEventListener("transitionend", e => {
             if (e.propertyName === "width") {
-                applyGlassTo(pill, "#pillDisplacementMap", "#pillGlassRefraction", 40, 3.2);
+                applyGlassTo(pill, "#pillDisplacementMap", "#pillGlassRefraction", 40, 2.4);
             }
         });
     }
