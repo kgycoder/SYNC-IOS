@@ -12,6 +12,71 @@
 
     const $ = (s, ctx) => (ctx || document).querySelector(s);
 
+    /* ---------- 0. Continuous Corner (Apple-style squircle) ----------
+       원과 달리 반지름이 요소 한 변의 절반보다 작을 때만 원과 다르게 보이는
+       초타원(superellipse) 코너. n이 클수록 "각지다가 급격히 둥글어지는"
+       애플 특유의 연속 곡률에 가까워진다. 각 모서리는 중심점(center)과
+       시작/끝 접선 벡터(u, v)로 정의하고, polygon()의 점들을 순서대로
+       나열하면 모서리 사이 직선 구간은 자동으로 이어진다. */
+    function squirclePolygon(w, h, radius, n, steps) {
+        n = n || 5; steps = steps || 14;
+        const r = Math.max(0, Math.min(radius, w / 2, h / 2));
+        if (r < 1) return "none";
+        const corners = [
+            { c: [w - r, r], u: [0, -1], v: [1, 0] },   // TR: (w-r,0) -> (w,r)
+            { c: [w - r, h - r], u: [1, 0], v: [0, 1] },// BR: (w,h-r) -> (w-r,h)
+            { c: [r, h - r], u: [0, 1], v: [-1, 0] },   // BL: (r,h) -> (0,h-r)
+            { c: [r, r], u: [-1, 0], v: [0, -1] }       // TL: (0,r) -> (r,0)
+        ];
+        const pts = [];
+        corners.forEach(function (cn) {
+            for (let i = 0; i <= steps; i++) {
+                const t = (i / steps) * (Math.PI / 2);
+                const ex = Math.pow(Math.cos(t), 2 / n);
+                const ey = Math.pow(Math.sin(t), 2 / n);
+                const x = cn.c[0] + cn.u[0] * r * ex + cn.v[0] * r * ey;
+                const y = cn.c[1] + cn.u[1] * r * ex + cn.v[1] * r * ey;
+                pts.push(x.toFixed(2) + "px " + y.toFixed(2) + "px");
+            }
+        });
+        return "polygon(" + pts.join(",") + ")";
+    }
+
+    function readRadius(el) {
+        const cs = getComputedStyle(el);
+        return parseFloat(cs.borderTopLeftRadius) || parseFloat(cs.borderRadius) || 0;
+    }
+
+    // .mob-srch-wrap는 하위 드롭다운(.sug-drop)이 캡슐 밖(아래)으로 펼쳐져야
+    // 하므로 본체에 clip-path를 걸 수 없다 (clip-path는 overflow까지 잘라냄).
+    // 대신 CSS 변수로 넘겨 유리 표면을 담당하는 :before 의사요소에서만 적용.
+    function applySquircleVar(el, varName, n) {
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        if (!r.width || !r.height) return;
+        const poly = squirclePolygon(r.width, r.height, readRadius(el), n);
+        el.style.setProperty(varName, poly);
+    }
+
+    // overflow:hidden이라 자식이 캡슐 밖으로 나갈 일이 없는 요소들은
+    // clip-path를 직접 걸어도 안전하다.
+    function applySquircleDirect(el, n) {
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        if (!r.width || !r.height) return;
+        const poly = squirclePolygon(r.width, r.height, readRadius(el), n);
+        el.style.clipPath = poly;
+        el.style.webkitClipPath = poly;
+    }
+
+    function applyAllSquircles() {
+        applySquircleVar(document.querySelector(".view.on .mob-srch-wrap"), "--squircle-clip");
+        applySquircleDirect(document.getElementById("mob-nav"));
+        const bar = document.getElementById("bar");
+        if (bar && !bar.classList.contains("bar-hidden")) applySquircleDirect(bar);
+        applySquircleDirect(document.getElementById("mnPill"));
+    }
+
     /* ---------- 1. 굴절 맵 생성 (kit과 동일한 수학) ---------- */
     const convexSquircle = x => Math.pow(Math.max(0, 1 - Math.pow(1 - x, 4)), .25);
 
@@ -117,6 +182,7 @@
     }
 
     function applyAllGlass() {
+        applyAllSquircles();
         applyGlassTo(visibleSearchWrap(), "#searchDisplacementMap", "#searchGlassRefraction", 28);
         applyGlassTo(document.getElementById("mob-nav"), "#navDisplacementMap", "#navGlassRefraction", 30);
         const bar = document.getElementById("bar");
@@ -134,7 +200,10 @@
         if (!bar) { setTimeout(watchBarVisibility, 100); return; }
         const mo = new MutationObserver(() => {
             if (!bar.classList.contains("bar-hidden")) {
-                setTimeout(() => applyGlassTo(bar, "#barDisplacementMap", "#barGlassRefraction", 32), 50);
+                setTimeout(function () {
+                    applySquircleDirect(bar);
+                    applyGlassTo(bar, "#barDisplacementMap", "#barGlassRefraction", 32);
+                }, 50);
             }
         });
         mo.observe(bar, { attributes: true, attributeFilter: ["class"] });
@@ -203,6 +272,7 @@
         if (!pill) return;
         pill.addEventListener("transitionend", e => {
             if (e.propertyName === "width") {
+                applySquircleDirect(pill);
                 applyGlassTo(pill, "#pillDisplacementMap", "#pillGlassRefraction", 40, 2.4);
             }
         });
