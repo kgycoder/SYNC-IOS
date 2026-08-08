@@ -4188,6 +4188,7 @@ button, a, div, span, input {
 /* ── 검색 캡슐 → Liquid Glass ── */
 .mob-srch-wrap {
     position: relative;
+    z-index: 60;
     margin-bottom: 20px;
     border-radius: 30px;
     /* overflow는 절대 hidden 금지: 검색 추천 드롭다운(.sug-drop)이 캡슐 아래로
