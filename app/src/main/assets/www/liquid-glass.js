@@ -56,7 +56,7 @@
         const d = squirclePathD(w, h, radius, n, steps);
         const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + Math.ceil(w) + '" height="' + Math.ceil(h) + '">' +
             '<path d="' + d + '" fill="#fff"/></svg>';
-        return "url(\"data:image/svg+xml,charset=UTF-8," + encodeURIComponent(svg) + "\")";
+        return "url(\"data:image/svg+xml;base64," + btoa(svg) + "\")";
     }
 
     function setMaskStyle(el, uri) {
