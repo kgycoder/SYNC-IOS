@@ -4197,6 +4197,7 @@ button, a, div, span, input {
        (clip-path는 border-radius와 달리 overflow까지 함께 잘라내므로, 본체에
        직접 걸면 드롭다운까지 잘려버린다.) */
     isolation: isolate;
+    --squircle-mask: none;
 }
 
     .mob-srch-wrap:before {
@@ -4217,8 +4218,12 @@ button, a, div, span, input {
             0 12px 34px rgba(0,0,0,.30);
         backdrop-filter: url(#liquidGlassSearchFilter);
         -webkit-backdrop-filter: blur(12px) saturate(1.4);
-        clip-path: url(#liquidGlassSearchClip);
-        -webkit-clip-path: url(#liquidGlassSearchClip);
+        mask-image: var(--squircle-mask);
+        -webkit-mask-image: var(--squircle-mask);
+        mask-size: 100% 100%;
+        -webkit-mask-size: 100% 100%;
+        mask-repeat: no-repeat;
+        -webkit-mask-repeat: no-repeat;
     }
 
 .mob-srch-wrap .srch-inp {
@@ -4295,8 +4300,6 @@ button, a, div, span, input {
         0 15px 45px rgba(0,0,0,.35);
     backdrop-filter: url(#liquidGlassNavFilter);
     -webkit-backdrop-filter: blur(14px) saturate(1.4);
-    clip-path: url(#liquidGlassNavClip);
-    -webkit-clip-path: url(#liquidGlassNavClip);
 }
 
     #mob-nav:before {
@@ -4331,8 +4334,6 @@ button, a, div, span, input {
     /* 강한 Edge 굴절: 전용 SVG 필터로 캡슐 가장자리를 렌즈처럼 왜곡시킨다 (범위/강도 확대) */
     backdrop-filter: url(#liquidGlassPillFilter);
     -webkit-backdrop-filter: blur(5px) saturate(1.5);
-    clip-path: url(#liquidGlassPillClip);
-    -webkit-clip-path: url(#liquidGlassPillClip);
     transition: left .46s cubic-bezier(.22,1.61,.36,1), width .46s cubic-bezier(.22,1.61,.36,1);
 }
 
@@ -4359,8 +4360,6 @@ button, a, div, span, input {
     background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.015)) !important;
     backdrop-filter: url(#liquidGlassBarFilter) !important;
     -webkit-backdrop-filter: blur(14px) saturate(1.4) !important;
-    clip-path: url(#liquidGlassBarClip) !important;
-    -webkit-clip-path: url(#liquidGlassBarClip) !important;
     border: 1px solid rgba(255,255,255,.14);
     box-shadow:
         inset 0 1px 0 rgba(255,255,255,.16),
