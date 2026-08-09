@@ -18,10 +18,12 @@
        애플 특유의 연속 곡률에 가까워진다. 각 모서리는 중심점(center)과
        시작/끝 접선 벡터(u, v)로 정의하고, polygon()의 점들을 순서대로
        나열하면 모서리 사이 직선 구간은 자동으로 이어진다. */
-    function squirclePolygon(w, h, radius, n, steps) {
+    function squirclePathD(w, h, radius, n, steps) {
         n = n || 5; steps = steps || 14;
         const r = Math.max(0, Math.min(radius, w / 2, h / 2));
-        if (r < 1) return "none";
+        if (r < 1) {
+            return "M0,0 L" + w + ",0 L" + w + "," + h + " L0," + h + " Z";
+        }
         const corners = [
             { c: [w - r, r], u: [0, -1], v: [1, 0] },   // TR: (w-r,0) -> (w,r)
             { c: [w - r, h - r], u: [1, 0], v: [0, 1] },// BR: (w,h-r) -> (w-r,h)
@@ -36,10 +38,10 @@
                 const ey = Math.pow(Math.sin(t), 2 / n);
                 const x = cn.c[0] + cn.u[0] * r * ex + cn.v[0] * r * ey;
                 const y = cn.c[1] + cn.u[1] * r * ex + cn.v[1] * r * ey;
-                pts.push(x.toFixed(2) + "px " + y.toFixed(2) + "px");
+                pts.push(x.toFixed(2) + "," + y.toFixed(2));
             }
         });
-        return "polygon(" + pts.join(",") + ")";
+        return "M" + pts[0] + " L" + pts.slice(1).join(" L") + " Z";
     }
 
     function readRadius(el) {
@@ -47,34 +49,25 @@
         return parseFloat(cs.borderTopLeftRadius) || parseFloat(cs.borderRadius) || 0;
     }
 
-    // .mob-srch-wrap는 하위 드롭다운(.sug-drop)이 캡슐 밖(아래)으로 펼쳐져야
-    // 하므로 본체에 clip-path를 걸 수 없다 (clip-path는 overflow까지 잘라냄).
-    // 대신 CSS 변수로 넘겨 유리 표면을 담당하는 :before 의사요소에서만 적용.
-    function applySquircleVar(el, varName, n) {
+    // clipPathUnits="userSpaceOnUse"인 <clipPath>의 <path d="">를 요소 크기에
+    // 맞춰 갱신한다. CSS는 이미 각 요소에 clip-path:url(#...)를 걸어두었으므로
+    // (search 캡슐은 :before에 걸려 있어 오버플로하는 드롭다운은 영향 없음)
+    // 여기서는 도형 좌표만 갱신하면 된다.
+    function updateSquirclePath(el, pathId, n) {
         if (!el) return;
         const r = el.getBoundingClientRect();
         if (!r.width || !r.height) return;
-        const poly = squirclePolygon(r.width, r.height, readRadius(el), n);
-        el.style.setProperty(varName, poly);
-    }
-
-    // overflow:hidden이라 자식이 캡슐 밖으로 나갈 일이 없는 요소들은
-    // clip-path를 직접 걸어도 안전하다.
-    function applySquircleDirect(el, n) {
-        if (!el) return;
-        const r = el.getBoundingClientRect();
-        if (!r.width || !r.height) return;
-        const poly = squirclePolygon(r.width, r.height, readRadius(el), n);
-        el.style.clipPath = poly;
-        el.style.webkitClipPath = poly;
+        const path = $(pathId);
+        if (!path) return;
+        path.setAttribute("d", squirclePathD(r.width, r.height, readRadius(el), n));
     }
 
     function applyAllSquircles() {
-        applySquircleVar(document.querySelector(".view.on .mob-srch-wrap"), "--squircle-clip");
-        applySquircleDirect(document.getElementById("mob-nav"));
+        updateSquirclePath(document.querySelector(".view.on .mob-srch-wrap"), "#searchSquirclePath");
+        updateSquirclePath(document.getElementById("mob-nav"), "#navSquirclePath");
         const bar = document.getElementById("bar");
-        if (bar && !bar.classList.contains("bar-hidden")) applySquircleDirect(bar);
-        applySquircleDirect(document.getElementById("mnPill"));
+        if (bar && !bar.classList.contains("bar-hidden")) updateSquirclePath(bar, "#barSquirclePath");
+        updateSquirclePath(document.getElementById("mnPill"), "#pillSquirclePath");
     }
 
     /* ---------- 1. 굴절 맵 생성 (kit과 동일한 수학) ---------- */
@@ -201,7 +194,7 @@
         const mo = new MutationObserver(() => {
             if (!bar.classList.contains("bar-hidden")) {
                 setTimeout(function () {
-                    applySquircleDirect(bar);
+                    updateSquirclePath(bar, "#barSquirclePath");
                     applyGlassTo(bar, "#barDisplacementMap", "#barGlassRefraction", 32);
                 }, 50);
             }
@@ -272,7 +265,7 @@
         if (!pill) return;
         pill.addEventListener("transitionend", e => {
             if (e.propertyName === "width") {
-                applySquircleDirect(pill);
+                updateSquirclePath(pill, "#pillSquirclePath");
                 applyGlassTo(pill, "#pillDisplacementMap", "#pillGlassRefraction", 40, 2.4);
             }
         });
