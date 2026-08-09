@@ -49,25 +49,49 @@
         return parseFloat(cs.borderTopLeftRadius) || parseFloat(cs.borderRadius) || 0;
     }
 
-    // clipPathUnits="userSpaceOnUse"인 <clipPath>의 <path d="">를 요소 크기에
-    // 맞춰 갱신한다. CSS는 이미 각 요소에 clip-path:url(#...)를 걸어두었으므로
-    // (search 캡슐은 :before에 걸려 있어 오버플로하는 드롭다운은 영향 없음)
-    // 여기서는 도형 좌표만 갱신하면 된다.
-    function updateSquirclePath(el, pathId, n) {
+    // 흰색 채움 = 보이는 영역, 투명 = 잘려나가는 영역인 SVG를 data URI 마스크로
+    // 만든다. clip-path:url()은 backdrop-filter와 함께 걸릴 때 이 WebView에서
+    // 안정적으로 반영되지 않아, 훨씬 폭넓게 지원되는 mask-image 방식으로 전환.
+    function squircleMaskUri(w, h, radius, n, steps) {
+        const d = squirclePathD(w, h, radius, n, steps);
+        const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + Math.ceil(w) + '" height="' + Math.ceil(h) + '">' +
+            '<path d="' + d + '" fill="#fff"/></svg>';
+        return "url(\"data:image/svg+xml,charset=UTF-8," + encodeURIComponent(svg) + "\")";
+    }
+
+    function setMaskStyle(el, uri) {
+        el.style.maskImage = uri;
+        el.style.webkitMaskImage = uri;
+        el.style.maskSize = "100% 100%";
+        el.style.webkitMaskSize = "100% 100%";
+        el.style.maskRepeat = "no-repeat";
+        el.style.webkitMaskRepeat = "no-repeat";
+        el.style.maskPosition = "center";
+        el.style.webkitMaskPosition = "center";
+    }
+
+    // .mob-srch-wrap 본체는 마스킹하면 안 된다 (추천 드롭다운이 캡슐 밖으로
+    // 펼쳐져야 함). 대신 CSS 변수로 넘겨 유리 표면 담당 :before에서만 마스킹.
+    function applySquircleMaskVar(el, varName, n) {
         if (!el) return;
         const r = el.getBoundingClientRect();
         if (!r.width || !r.height) return;
-        const path = $(pathId);
-        if (!path) return;
-        path.setAttribute("d", squirclePathD(r.width, r.height, readRadius(el), n));
+        el.style.setProperty(varName, squircleMaskUri(r.width, r.height, readRadius(el), n));
+    }
+
+    function applySquircleMaskDirect(el, n) {
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        if (!r.width || !r.height) return;
+        setMaskStyle(el, squircleMaskUri(r.width, r.height, readRadius(el), n));
     }
 
     function applyAllSquircles() {
-        updateSquirclePath(document.querySelector(".view.on .mob-srch-wrap"), "#searchSquirclePath");
-        updateSquirclePath(document.getElementById("mob-nav"), "#navSquirclePath");
+        applySquircleMaskVar(document.querySelector(".view.on .mob-srch-wrap"), "--squircle-mask");
+        applySquircleMaskDirect(document.getElementById("mob-nav"));
         const bar = document.getElementById("bar");
-        if (bar && !bar.classList.contains("bar-hidden")) updateSquirclePath(bar, "#barSquirclePath");
-        updateSquirclePath(document.getElementById("mnPill"), "#pillSquirclePath");
+        if (bar && !bar.classList.contains("bar-hidden")) applySquircleMaskDirect(bar);
+        applySquircleMaskDirect(document.getElementById("mnPill"));
     }
 
     /* ---------- 1. 굴절 맵 생성 (kit과 동일한 수학) ---------- */
@@ -194,7 +218,7 @@
         const mo = new MutationObserver(() => {
             if (!bar.classList.contains("bar-hidden")) {
                 setTimeout(function () {
-                    updateSquirclePath(bar, "#barSquirclePath");
+                    applySquircleMaskDirect(bar);
                     applyGlassTo(bar, "#barDisplacementMap", "#barGlassRefraction", 32);
                 }, 50);
             }
@@ -265,7 +289,7 @@
         if (!pill) return;
         pill.addEventListener("transitionend", e => {
             if (e.propertyName === "width") {
-                updateSquirclePath(pill, "#pillSquirclePath");
+                applySquircleMaskDirect(pill);
                 applyGlassTo(pill, "#pillDisplacementMap", "#pillGlassRefraction", 40, 2.4);
             }
         });
